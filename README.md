@@ -30,13 +30,27 @@ npm run build
 npm start
 ```
 
-## Deploy (Firebase)
+## Deploy (Firebase App Hosting)
 
-This app uses server features (API route, Admin SDK), so deploy with **Firebase App Hosting** (not static-only Hosting). Use the [App Hosting docs](https://firebase.google.com/docs/app-hosting), run **`firebase init apphosting`** once, set production env vars in the console, then:
+This app uses server features (API route, Admin SDK). Use [App Hosting](https://firebase.google.com/docs/app-hosting) (not static-only Hosting).
 
-```bash
-firebase deploy
-```
+**Why builds fail on first deploy:** Cloud Build runs `next build`, which loads model data via Firebase Admin. Your service account JSON is **not** in Git — you must give App Hosting a **secret** so `FIREBASE_SERVICE_ACCOUNT_JSON` exists at **BUILD** and **RUNTIME**.
+
+1. From the repo root (with `firebase use` pointing at this project), create the secret once (path is your local gitignored key):
+
+   ```bash
+   firebase apphosting:secrets:set FIREBASE_SERVICE_ACCOUNT_JSON --data-file ./lib/firebase-private-key.json --force
+   ```
+
+2. Adjust **`apphosting.yaml`** if your project id, Firestore database id, or storage bucket differ from the values there.
+
+3. Deploy:
+
+   ```bash
+   firebase deploy
+   ```
+
+If a rollout still fails, open the **Cloud Build** link from the CLI output and read the first red error line.
 
 ## Scripts
 

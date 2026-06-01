@@ -2,23 +2,31 @@
 # See https://firebase.google.com/docs/app-hosting/configure#cloud-run
 runConfig:
   minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512
 
-# Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
-
-  # Grant access to secrets in Cloud Secret Manager.
-  # You can create secrets with the CLI command `firebase apphosting:secrets:set <secretName>`.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+# Required for `next build` + runtime: Admin SDK cannot use gitignored JSON on disk in Cloud Build.
+# 1) Create the secret once (from project root, uses your local key file):
+#    firebase apphosting:secrets:set FIREBASE_SERVICE_ACCOUNT_JSON --data-file ./lib/firebase-private-key.json --force
+# 2) Commit this file, then: firebase deploy
+#
+# Docs: https://firebase.google.com/docs/app-hosting/configure#secret-parameters
+env:
+  - variable: FIREBASE_SERVICE_ACCOUNT_JSON
+    secret: FIREBASE_SERVICE_ACCOUNT_JSON
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_PROJECT_ID
+    value: aos-spaces
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIRESTORE_DATABASE_ID
+    value: aos-db
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_STORAGE_BUCKET
+    value: aos-spaces.firebasestorage.app
+    availability:
+      - BUILD
+      - RUNTIME
