@@ -42,15 +42,31 @@ This app uses server features (API route, Admin SDK). Use [App Hosting](https://
    firebase apphosting:secrets:set FIREBASE_SERVICE_ACCOUNT_JSON --data-file ./lib/firebase-private-key.json --force
    ```
 
-2. Adjust **`apphosting.yaml`** if your project id, Firestore database id, or storage bucket differ from the values there.
+2. Let the backend read that secret during Cloud Build and at runtime (replace `aos-backend` if yours differs):
 
-3. Deploy:
+   ```bash
+   firebase apphosting:secrets:grantaccess FIREBASE_SERVICE_ACCOUNT_JSON --backend aos-backend
+   ```
+
+3. **`apphosting.yaml`** in this repo already wires that secret plus `FIREBASE_PROJECT_ID`, `FIRESTORE_DATABASE_ID`, and `FIREBASE_STORAGE_BUCKET`. Edit the file if your values differ.
+
+4. **`firebase.json`** must use `"rootDir": "."` (not `"/"`), so Cloud Build runs `npm ci` in the folder that contains `package.json`.
+
+5. Deploy:
 
    ```bash
    firebase deploy
    ```
 
-If a rollout still fails, open the **Cloud Build** link from the CLI output and read the first red error line.
+### If the rollout still fails
+
+Open the **Cloud Build** log URL from the CLI. Typical cases:
+
+| Log hint | What to do |
+|----------|------------|
+| `ENOENT` … `firebase-private-key.json` / “Firebase Admin has no credentials” | Secret missing or not granted: redo steps 1–2; confirm `apphosting.yaml` has `availability: [BUILD, RUNTIME]` for that secret. |
+| `npm ci` / lockfile | Commit **`package-lock.json`**; run `npm install` locally and commit if lock was out of date. |
+| Next / adapter errors | See [App Hosting Next support](https://firebase.google.com/docs/app-hosting/frameworks-tooling); you may need a supported Next minor if the adapter lags. |
 
 Also check **Firebase console → App Hosting → your backend → Deployment settings**: **App root directory** should match the repo root (e.g. `.` or empty), not a lone `/`, or GitHub rollouts can disagree with `firebase.json`.
 

@@ -22,13 +22,37 @@ function loadServiceAccountFromDisk(): admin.ServiceAccount {
   return JSON.parse(raw) as admin.ServiceAccount
 }
 
+function missingCredentialsMessage(): string {
+  return [
+    "Firebase Admin has no credentials.",
+    "Local: set FIREBASE_SERVICE_ACCOUNT_JSON or add lib/firebase-private-key.json (gitignored).",
+    "App Hosting: store minified service account JSON as secret FIREBASE_SERVICE_ACCOUNT_JSON, then:",
+    "  firebase apphosting:secrets:set FIREBASE_SERVICE_ACCOUNT_JSON --data-file ./lib/firebase-private-key.json --force",
+    "  firebase apphosting:secrets:grantaccess FIREBASE_SERVICE_ACCOUNT_JSON --backend aos-backend",
+  ].join(" ")
+}
+
 function loadServiceAccount(): admin.ServiceAccount {
-  const inline = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
+  const inline = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim()
   if (inline) {
-    return JSON.parse(inline) as admin.ServiceAccount
+    try {
+      return JSON.parse(inline) as admin.ServiceAccount
+    } catch {
+      throw new Error(
+        "FIREBASE_SERVICE_ACCOUNT_JSON is set but is not valid JSON. Use one minified line (no trailing junk) for App Hosting secrets.",
+      )
+    }
   }
 
-  return loadServiceAccountFromDisk()
+  try {
+    return loadServiceAccountFromDisk()
+  } catch (e: unknown) {
+    const err = e as { code?: string }
+    if (err?.code === "ENOENT") {
+      throw new Error(missingCredentialsMessage())
+    }
+    throw e
+  }
 }
 
 function getFirebaseApp(): admin.app.App {
@@ -45,7 +69,7 @@ function getFirebaseApp(): admin.app.App {
 
   if (!projectId) {
     throw new Error(
-      "Firebase service account JSON is missing project_id. Set FIREBASE_PROJECT_ID in .env.local.",
+      "Firebase service account JSON is missing project_id. Set FIREBASE_PROJECT_ID in .env.local or in apphosting.yaml / App Hosting env.",
     )
   }
 
