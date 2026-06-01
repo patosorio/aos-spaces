@@ -52,6 +52,8 @@ This app uses server features (API route, Admin SDK). Use [App Hosting](https://
 
 If a rollout still fails, open the **Cloud Build** link from the CLI output and read the first red error line.
 
+Also check **Firebase console → App Hosting → your backend → Deployment settings**: **App root directory** should match the repo root (e.g. `.` or empty), not a lone `/`, or GitHub rollouts can disagree with `firebase.json`.
+
 ## Scripts
 
 | Command        | Description           |
