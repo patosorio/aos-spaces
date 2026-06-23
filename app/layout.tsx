@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: 'AOS SPACES | Premium Tiny Houses',
   description: 'Architectural tiny houses designed for modern living. Discover our collection of panoramic, all-season cabins.',
   generator: 'v0.app',
+  verification: {
+    google: '2iohls8tvZuH-xD4mg27C-wddSW9Z1Z24ALSWi__qtY',
+  },
   icons: {
     icon: [
       {

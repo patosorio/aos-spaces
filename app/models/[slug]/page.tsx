@@ -185,7 +185,7 @@ export default async function ModelPage({
             schedule a viewing.
           </p>
           <a
-            href="mailto:hello@aosspaces.com"
+            href="mailto:hello@theartofasimplelife.com"
             className="inline-block mt-8 px-8 py-4 bg-primary text-primary-foreground text-sm tracking-wide hover:opacity-90 transition-opacity"
           >
             Contact Us

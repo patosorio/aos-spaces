@@ -33,8 +33,8 @@ export function Footer() {
           <div>
             <h4 className="text-sm tracking-wide uppercase mb-4 opacity-70">Get in Touch</h4>
             <div className="flex flex-col gap-3 text-sm">
-              <a href="mailto:hello@aosspaces.com" className="hover:opacity-70 transition-opacity">
-                hello@aosspaces.com
+              <a href="mailto:hello@theartofasimplelife.com" className="hover:opacity-70 transition-opacity">
+                hello@theartofasimplelife.com
               </a>
               <p className="text-primary-foreground/70">
                 Available for inquiries and custom orders
